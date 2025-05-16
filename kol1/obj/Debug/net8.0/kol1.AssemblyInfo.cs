@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("kol1")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2231b0bff3d86144960471a4a3c07f116820b42d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9d9883db25dfc2d7e46b06e4c283f0e83466a748")]
 [assembly: System.Reflection.AssemblyProductAttribute("kol1")]
 [assembly: System.Reflection.AssemblyTitleAttribute("kol1")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

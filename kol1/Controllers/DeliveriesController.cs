@@ -27,13 +27,13 @@ public class DeliveriesController : ControllerBase
             }
 
             var res = await _deliveriesService.GetDeliveryAsync(id);
+            return Ok(res);
         }
         catch (Exception e)
         {
             return BadRequest(e.Message);
         }
-
-        return Ok(res);
+        
     }
 
 
