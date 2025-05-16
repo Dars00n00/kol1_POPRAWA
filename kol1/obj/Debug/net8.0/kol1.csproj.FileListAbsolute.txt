@@ -76,3 +76,4 @@ C:\Users\s31771\RiderProjects\kol1\kol1\obj\Debug\net8.0\refint\kol1.dll
 C:\Users\s31771\RiderProjects\kol1\kol1\obj\Debug\net8.0\kol1.pdb
 C:\Users\s31771\RiderProjects\kol1\kol1\obj\Debug\net8.0\kol1.genruntimeconfig.cache
 C:\Users\s31771\RiderProjects\kol1\kol1\obj\Debug\net8.0\ref\kol1.dll
+C:\Users\s31771\RiderProjects\kol1\kol1\obj\Debug\net8.0\kol1.sourcelink.json

@@ -126,11 +126,11 @@ public class DeliveriesService : IDeliveriesService
 
         try
         {
-            var license_number = delivery.LicenceNumber;
+            var licenseNumber = delivery.LicenceNumber;
             command.CommandText = @"SELECT driver_id 
                                     FROM Driver 
                                     WHERE licence_number = @license_number";
-            command.Parameters.AddWithValue("@license_number", license_number);
+            command.Parameters.AddWithValue("@license_number", licenseNumber);
             var driverIdObj = await command.ExecuteScalarAsync();
             if (driverIdObj == null)
             {
@@ -180,7 +180,7 @@ public class DeliveriesService : IDeliveriesService
         }
         catch (Exception e)
         {
-            transaction.Rollback();
+            await transaction.RollbackAsync();
             return false;
         }
     }
