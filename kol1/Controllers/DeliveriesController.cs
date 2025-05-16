@@ -19,12 +19,20 @@ public class DeliveriesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetDelivery([FromRoute] int id)
     {
-        if (!await _deliveriesService.DoesDeliveryExistAsync(id))
+        try
         {
-            return NotFound();
+            if (!await _deliveriesService.DoesDeliveryExistAsync(id))
+            {
+                return NotFound();
+            }
+
+            var res = await _deliveriesService.GetDeliveryAsync(id);
         }
-        
-        var res = await _deliveriesService.GetDeliveryAsync(id);
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+
         return Ok(res);
     }
 
@@ -32,19 +40,25 @@ public class DeliveriesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> PostDelivery([FromBody] PostDeliveryDTO delivery)
     {
-        if (await _deliveriesService.DoesDeliveryExistAsync(delivery.DeliveryId))
+        try
         {
-            return BadRequest();
+            if (await _deliveriesService.DoesDeliveryExistAsync(delivery.DeliveryId))
+            {
+                return BadRequest();
+            }
+
+            if (!await _deliveriesService.AddNewDelivery(delivery))
+            {
+                return BadRequest();
+            }
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
         }
 
-        if (await _deliveriesService.AddNewDelivery(delivery))
-        {
-            return Ok();
-        }
-        else
-        {
-            return BadRequest();
-        }
+
+        return Ok();
     }
     
 }
