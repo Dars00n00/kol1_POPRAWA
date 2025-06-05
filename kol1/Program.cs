@@ -7,7 +7,6 @@
 using kol1.Services;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile(
@@ -41,14 +40,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
 var app = builder.Build(); 
-
-/*
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}*/
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
@@ -68,14 +60,7 @@ app.Run();
 
 
 
-//==================================================
-//w appsettings.json umiescić connection string
-/*
- "ConnectionStrings": {
-    "nazwa": "connection string"
-}
-//aby pobrać conn str należy użyć Iconfiguration
-//dot net autoamtycznie wstrzykuje zależność
-IConfiguration configuration;
-var connStr = configuration.GetConnectionString("nazwa");
-*/
+// aby pobrać conn str należy użyć Iconfiguration
+// dot net automatycznie wstrzykuje zależność
+// IConfiguration configuration;
+// var connStr = configuration.GetConnectionString("nazwa");

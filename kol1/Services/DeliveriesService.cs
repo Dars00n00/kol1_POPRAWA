@@ -1,8 +1,10 @@
-using System.Data;
+using kol1.Exceptions;
 using kol1.Models;
 using Microsoft.Data.SqlClient;
 
+
 namespace kol1.Services;
+
 
 public class DeliveriesService : IDeliveriesService
 {
@@ -14,11 +16,12 @@ public class DeliveriesService : IDeliveriesService
         _connectionString = configuration.GetConnectionString("main");
     }
 
+    //metody pomocnicze do walidacji danych
     public async Task<bool> DoesDeliveryExistAsync(int id)
     {
         string commandStr = @"Select count(*) 
-                            FROM Delivery 
-                            WHERE delivery_id = @id";
+                              FROM k1r_Delivery 
+                              WHERE delivery_id = @id";
 
         await using var connection = new SqlConnection(_connectionString);
         await using var command = new SqlCommand(commandStr, connection);
@@ -27,27 +30,83 @@ public class DeliveriesService : IDeliveriesService
 
         await connection.OpenAsync();
 
-        await using var reader = await command.ExecuteReaderAsync();
-
-        await reader.ReadAsync();
-
-        var result = reader.GetInt32(reader.GetOrdinal("delivery_id"));
-
-        return result == 1;
+        var amountObj = await command.ExecuteScalarAsync();
+        var amountInt = (int)amountObj;
+        
+        return amountInt == 1;
     }
 
-    public async Task<GetDeliveryDTO> GetDeliveryAsync(int id)
+    public async Task<bool> DoesClientExistAsync(int id)
     {
-        string commandStr = @"Select delivery.date, 
-                           customer.first_name, customer.last_name, customer.date_of_birth,
-                           driver.first_name, driver.last_name, driver.date_of_birth,
-                           products.name, products.price, producsts_delivery.amount
-                           FROM Delivery
-                           INNER JOIN Customer ON Delivery.customer_id = Customer.customer_id
-                           INNER JOIN Product_Delivery ON Delivery.delivery_id = Product_Delivery.delivery_id
-                           INNER JOIN Driver ON Delivery.driver_id = Driver.driver_id
-                           INNER JOIN Product ON Product_Delivery.product_id = Product.product_id
-                           WHERE Delivery.delivery_id = @id;";
+        string commandStr = @"Select count(*) 
+                              FROM k1r_Customer 
+                              WHERE customer_id = @id";
+
+        await using var connection = new SqlConnection(_connectionString);
+        await using var command = new SqlCommand(commandStr, connection);
+
+        command.Parameters.AddWithValue("@id", id);
+
+        await connection.OpenAsync();
+
+        var amountObj = await command.ExecuteScalarAsync();
+        var amountInt = (int)amountObj;
+        
+        return amountInt == 1;
+    }
+
+    public async Task<bool> DoesDriverExistAsync(string licenceNumber)
+    {
+        string commandStr = @"Select count(*) 
+                              FROM k1r_Driver
+                              WHERE licence_number = @licenceNumber";
+
+        await using var connection = new SqlConnection(_connectionString);
+        await using var command = new SqlCommand(commandStr, connection);
+
+        command.Parameters.AddWithValue("@licenceNumber", licenceNumber);
+
+        await connection.OpenAsync();
+
+        var amountObj = await command.ExecuteScalarAsync();
+        var amountInt = (int)amountObj;
+        
+        return amountInt == 1;
+    }
+
+    public async Task<bool> DoesProductExistAsync(string productName)
+    {
+        string commandStr = @"Select count(*) 
+                              FROM k1r_Product
+                              WHERE name = @productName;";
+
+        await using var connection = new SqlConnection(_connectionString);
+        await using var command = new SqlCommand(commandStr, connection);
+
+        command.Parameters.AddWithValue("@productName", productName);
+
+        await connection.OpenAsync();
+
+        var amountObj = await command.ExecuteScalarAsync();
+        var amountInt = (int)amountObj;
+        
+        return amountInt == 1;
+    }
+    
+
+    //metody do rozwiązania kolokwium
+    public async Task<GetDeliveryDto> GetDeliveryAsync(int id)
+    {
+        string commandStr = @"Select d.date, 
+                              c.first_name, c.last_name, c.date_of_birth,
+                              dr.first_name AS dr_first_name, dr.last_name dr_last_name, dr.licence_number,
+                              p.name AS product_name, p.price, pd.amount
+                              FROM k1r_Delivery d
+                              INNER JOIN k1r_Customer c ON d.customer_id = c.customer_id
+                              INNER JOIN k1r_Product_Delivery pd ON d.delivery_id = pd.delivery_id
+                              INNER JOIN k1r_Driver dr ON d.driver_id = dr.driver_id
+                              INNER JOIN k1r_Product p ON pd.product_id = p.product_id
+                              WHERE d.delivery_id = @id;";
 
         await using var connection = new SqlConnection(_connectionString);
         await using var command = new SqlCommand(commandStr, connection);
@@ -58,62 +117,53 @@ public class DeliveriesService : IDeliveriesService
 
         await using var reader = await command.ExecuteReaderAsync();
 
-        GetDeliveryDTO delivery = null;
-
-
-        var productsDict = new Dictionary<string, ProductsDTO>();
+        GetDeliveryDto delivery = null;
+        
+        var productsDictionary = new Dictionary<string, GetProductDto>();
 
         while (await reader.ReadAsync())
         {
-            if (delivery == null)
+            delivery ??= new GetDeliveryDto()
             {
-                delivery = new GetDeliveryDTO
-                {
-                    Date = reader.GetDateTime(reader.GetOrdinal("date")), 
-                    Customer = null,
-                    Driver = null,
-                    Products = new List<ProductsDTO>()
-                };
-            }
+                Date = reader.GetDateTime(reader.GetOrdinal("date")),
+                Customer = null,
+                Driver = null,
+                Products = new List<GetProductDto>()
+            };
 
-            if (delivery.Customer == null)
+            delivery.Customer ??= new GetCustomerDto
             {
-                delivery.Customer = new CustomerDTO
-                {
-                    FirstName = reader.GetString(reader.GetOrdinal("first_name")),
-                    LastName = reader.GetString(reader.GetOrdinal("last_name")),
-                    DateOfBirth = reader.GetDateTime(reader.GetOrdinal("date_of_birth")),
-                };
-            }
+                FirstName = reader.GetString(reader.GetOrdinal("first_name")),
+                LastName = reader.GetString(reader.GetOrdinal("last_name")),
+                DateOfBirth = reader.GetDateTime(reader.GetOrdinal("date_of_birth")),
+            };
 
-            if (delivery.Driver == null)
+            delivery.Driver ??= new GetDriverDto
             {
-                delivery.Driver = new DriverDTO()
-                {
-                    FirstName = reader.GetString(reader.GetOrdinal("first_name")),
-                    LastName = reader.GetString(reader.GetOrdinal("last_name")),
-                    LicenseNumber = reader.GetString(reader.GetOrdinal("license_number")),
-                };
-            }
+                FirstName = reader.GetString(reader.GetOrdinal("dr_first_name")),
+                LastName = reader.GetString(reader.GetOrdinal("dr_last_name")),
+                LicenseNumber = reader.GetString(reader.GetOrdinal("licence_number")),
+            };
 
-            var productStr = reader.GetString(reader.GetOrdinal("product_name"));
+            var productName = reader.GetString(reader.GetOrdinal("product_name"));
 
-            if (!productsDict.TryGetValue(productStr, out var prod))
+            if (!productsDictionary.TryGetValue(productName, out var product))
             {
-                prod = new ProductsDTO
+                product = new GetProductDto
                 {
-                    Name = reader.GetString(reader.GetOrdinal("name")),
+                    Name = reader.GetString(reader.GetOrdinal("product_name")),
                     Price = reader.GetDecimal(reader.GetOrdinal("price")),
                     Amount = reader.GetInt32(reader.GetOrdinal("amount")),
                 };
-                productsDict[productStr] = prod;
-                delivery.Products.Add(prod);
+                productsDictionary[productName] = product;
+                delivery.Products.Add(product);
             }
         }
+        
         return delivery;
     }
 
-    public async Task<bool> AddNewDelivery(PostDeliveryDTO delivery)
+    public async Task<bool> AddNewDeliveryAsync(PostDeliveryDto delivery)
     {
         await using var connection = new SqlConnection(_connectionString);
         await using var command = new SqlCommand();
@@ -126,63 +176,113 @@ public class DeliveriesService : IDeliveriesService
 
         try
         {
-            var licenseNumber = delivery.LicenceNumber;
-            command.CommandText = @"SELECT driver_id 
-                                    FROM Driver 
-                                    WHERE licence_number = @license_number";
-            command.Parameters.AddWithValue("@license_number", licenseNumber);
-            var driverIdObj = await command.ExecuteScalarAsync();
-            if (driverIdObj == null)
+            if (await DoesDeliveryExistAsync(delivery.DeliveryId))
             {
-                throw new Exception("Driver not found");
+                throw new DeliveryExistsException($"delivery with id={delivery.DeliveryId} already exists");
             }
 
+            if (!await DoesClientExistAsync(delivery.CustomerId))
+            {
+                throw new CustomerNotFoundException($"customer with id={delivery.CustomerId} does not exist");
+            }
+
+            if (!await DoesDriverExistAsync(delivery.LicenceNumber))
+            {
+                throw new DriverNotFoundException($"driver with licence={delivery.LicenceNumber} does not exist");
+            }
+
+            foreach (var product in delivery.Products)
+            {
+                if (!await DoesProductExistAsync(product.Name))
+                {
+                    throw new ProductNotFoundException($"product with name={product.Name} does not exist");
+                }
+            }
+
+            //pobranie id kierowcy
+            command.CommandText = @"SELECT driver_id 
+                                    FROM k1r_Driver 
+                                    WHERE licence_number = @licenseNumber";
+            command.Parameters.AddWithValue("@licenseNumber", delivery.LicenceNumber);
+            var driverIdObj = await command.ExecuteScalarAsync();
             var driverId = (int)driverIdObj;
+
             command.Parameters.Clear();
 
-            command.CommandText = "INSERT INTO Delivery VALUES(@deliveryId, @customerId, @driverId, @date)";
+            //dodanie dostawy do delivery
+            command.CommandText = @"INSERT INTO k1r_Delivery 
+                                    (delivery_id, customer_id, driver_id, date) 
+                                    VALUES
+                                    (@deliveryId, @customerId, @driverId, @date);";
             command.Parameters.AddWithValue("@deliveryId", delivery.DeliveryId);
             command.Parameters.AddWithValue("@customerId", delivery.CustomerId);
             command.Parameters.AddWithValue("@driverId", driverId);
             command.Parameters.AddWithValue("@date", DateTime.Now);
             await command.ExecuteNonQueryAsync();
+
             command.Parameters.Clear();
 
-            var productsIds = new List<int>();
+
+            //pobranie id produktów z dostawy
+            var productsDictionary = new Dictionary<int, PostProductDto>(); // <id_product, PostProductDto>
             foreach (var product in delivery.Products)
             {
-                command.CommandText = "SELECT product_id FROM Product WHERE name = @name";
+                command.CommandText = @"SELECT product_id 
+                                        FROM k1r_Product 
+                                        WHERE name = @name";
                 command.Parameters.AddWithValue("@name", product.Name);
                 var productIdObj = await command.ExecuteScalarAsync();
-                if (productIdObj == null)
-                {
-                    throw new Exception("Product not found");
-                }
-
                 var productId = (int)productIdObj;
-                productsIds.Add(productId);
+                productsDictionary[productId] = product;
+
                 command.Parameters.Clear();
             }
 
-
-            foreach (var productId in productsIds)
+            //dodanie produktów do tabeli product_delivery
+            foreach (var product in productsDictionary)
             {
-                command.CommandText = "INSERT INTO Product_Delivery VALUES(@productId, @deliveryId, @amount)";
-                command.Parameters.AddWithValue("@productId", productId);
+                command.CommandText = @"INSERT INTO k1r_Product_Delivery
+                                        (product_id, delivery_id, amount)
+                                        VALUES
+                                        (@productId, @deliveryId, @amount);";
+                command.Parameters.AddWithValue("@productId", product.Key);
                 command.Parameters.AddWithValue("@deliveryId", delivery.DeliveryId);
-                command.Parameters.AddWithValue("@amount", 0);
+                command.Parameters.AddWithValue("@amount", product.Value.Amount);
                 await command.ExecuteNonQueryAsync();
+
                 command.Parameters.Clear();
             }
 
             await transaction.CommitAsync();
+
             return true;
+        }
+        catch (DeliveryExistsException e)
+        {
+            await transaction.RollbackAsync();
+            throw e;
+        }
+        catch (CustomerNotFoundException e)
+        {
+            await transaction.RollbackAsync();
+            throw e;
+        }
+        catch (DriverNotFoundException e)
+        {
+            await transaction.RollbackAsync();
+            throw e;
+        }
+        catch (ProductNotFoundException e)
+        {
+            await transaction.RollbackAsync();
+            throw e;
         }
         catch (Exception e)
         {
             await transaction.RollbackAsync();
             return false;
         }
+        
     }
 }
 

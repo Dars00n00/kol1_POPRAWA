@@ -2175,26 +2175,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\s31771\\.nuget\\packages\\": {}
+    "C:\\Users\\Dariusz\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\s31771\\RiderProjects\\kol1\\kol1\\kol1.csproj",
+      "projectUniqueName": "C:\\Users\\Dariusz\\RiderProjects\\kolokwium1\\kol1\\kol1.csproj",
       "projectName": "kol1",
-      "projectPath": "C:\\Users\\s31771\\RiderProjects\\kol1\\kol1\\kol1.csproj",
-      "packagesPath": "C:\\Users\\s31771\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\s31771\\RiderProjects\\kol1\\kol1\\obj\\",
+      "projectPath": "C:\\Users\\Dariusz\\RiderProjects\\kolokwium1\\kol1\\kol1.csproj",
+      "packagesPath": "C:\\Users\\Dariusz\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Dariusz\\RiderProjects\\kolokwium1\\kol1\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\s31771\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\Dariusz\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -2212,7 +2210,8 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net8.0": {
@@ -2258,7 +2257,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Users\\Dariusz\\.dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
