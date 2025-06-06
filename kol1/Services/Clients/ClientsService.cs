@@ -196,7 +196,7 @@ public class ClientsService : IClientsService
                     clientDto.DateTo);
 
             command.CommandText = @"INSERT INTO k1pr_car_rentals 
-                                    (clientid, carid, datefrom, dateto, totalprice)
+                                    (clientid, carId, datefrom, dateto, totalprice)
                                     VALUES 
                                     (@clientid, @carid, @datefrom, @dateto, @totalprice);";
             command.Parameters.AddWithValue("@clientid", clientId);

@@ -26,17 +26,17 @@ public class ClientsController : ControllerBase
         try
         {
             var res = await _clientsService.GetClientAsync(id);
-            Console.WriteLine(res.FirstName + " " + res.LastName + " " + res.Address);
+            //Console.WriteLine(res.FirstName + " " + res.LastName + " " + res.Address);
             return Ok(res);
         }
         catch (ClientNotFoundException ex)
         {
             return NotFound(ex.Message);
         }
-        /*catch (Exception ex)
+        catch (Exception ex)
         {
             return StatusCode(500, ex.Message);
-        }*/
+        }
     }
 
 

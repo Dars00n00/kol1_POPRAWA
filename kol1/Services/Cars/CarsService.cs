@@ -22,7 +22,7 @@ public class CarsService : ICarsService
         await using var connection = new SqlConnection(_connectionString);
         await using var command = new SqlCommand(commandStr, connection);
 
-        command.Parameters.AddWithValue("@id", carId);
+        command.Parameters.AddWithValue("@carId", carId);
 
         await connection.OpenAsync();
 
