@@ -5,6 +5,8 @@
 
 
 using kol1.Services;
+using kol1.Services.Clients;
+using kol1.Services.Cars;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +17,8 @@ builder.Configuration.AddJsonFile(
     reloadOnChange: true
 );
 
-builder.Services.AddScoped<IDeliveriesService, DeliveriesService>();
+builder.Services.AddScoped<IClientsService, ClientsService>();
+builder.Services.AddScoped<ICarsService, CarsService>();
 
 builder.Services.AddAuthorization(); 
 builder.Services.AddControllers(); 
@@ -32,11 +35,7 @@ builder.Services.AddSwaggerGen(c =>
             Name = "Dariusz",
             Email = "xxxxx@gmail.com",
             Url = new Uri("https://github.com/Dars00n00")
-        },
-        // License = new()
-        // {
-        //     
-        // }
+        }
     });
 });
 
@@ -57,10 +56,3 @@ app.UseAuthorization();
 app.MapControllers(); 
 
 app.Run();
-
-
-
-// aby pobrać conn str należy użyć Iconfiguration
-// dot net automatycznie wstrzykuje zależność
-// IConfiguration configuration;
-// var connStr = configuration.GetConnectionString("nazwa");
